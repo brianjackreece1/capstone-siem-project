@@ -1,0 +1,116 @@
+
+CAPSTONE SIEM PROJECT
+SPLUNK DETECTION QUERIES
+
+
+
+1. WINDOWS EVENTS
+
+index=windows
+
+
+2. LINUX EVENTS
+
+index=linux
+
+
+3. FAILED SSH AUTHENTICATION
+
+index=linux sourcetype=linux_secure "Failed password"
+
+
+4. SSH BRUTEFORCE DETECTION
+
+index=linux sourcetype=linux_secure "Failed password"
+| rex "Failed password for (?:invalid user )?(?<user>\S+) from (?<src_ip>\S+)"
+| stats count by src_ip user
+| where count >= 3
+| sort  count
+
+
+5. WINDOWS ACCOUNT CREATION
+
+index=windows EventCode=4720
+
+
+6. WINDOWS PRIVILEGED GROUP MODIFICATION
+
+index=windows EventCode=4732
+
+
+7. ACCOUNT CREATION AND PRIVILEGE CHANGE CORRELATION
+
+index=windows (EventCode=4720 OR EventCode=4732)
+| sort _time
+
+
+8. WINDOWS PROCESS CREATION
+
+index=windows EventCode=4688
+
+
+9. POWERSHELL SCRIPT BLOCK LOGGING
+
+index=windows EventCode=4104
+
+
+10. POWERSHELL / PROCESS INVESTIGATION
+
+index=windows EventCode=4688
+| search New_Process_Name="*powershell.exe*" OR Process_Command_Line="*GetProcess*"
+
+
+11. WINDOWS SECURITY LOG CLEARED
+
+index=windows EventCode=1102
+
+
+12. WINDOWS SECURITY EVENTS
+
+index=windows sourcetype="WinEventLog:Security"
+
+
+13. WINDOWS SYSTEM EVENTS
+
+index=windows sourcetype="WinEventLog:System"
+
+
+14. WINDOWS APPLICATION EVENTS
+
+index=windows sourcetype="WinEventLog:Application"
+
+15. POWERSHELL OPERATIONAL EVENTS
+
+index=windows sourcetype="WinEventLog:MicrosoftWindowsPowerShell/Operational"
+
+
+16. LINUX SYSTEM LOGS
+
+index=linux sourcetype=syslog
+
+
+17. LINUX AUTHENTICATION LOGS
+
+index=linux sourcetype=linux_secure
+
+
+18. EVENT ID 4720 AND 4732 INVESTIGATION
+
+index=windows (EventCode=4720 OR EventCode=4732)
+| table _time EventCode host Account_Name TargetUserName MemberName Group_Name
+| sort _time
+
+
+19. PROCESS CREATION INVESTIGATION
+
+index=windows EventCode=4688
+| table _time host EventCode New_Process_Name Creator_Process_Name
+| sort _time
+
+
+20. GENERAL SECURITY INVESTIGATION
+
+(index=windows OR index=linux)
+| stats count by host sourcetype
+| sort  count
+

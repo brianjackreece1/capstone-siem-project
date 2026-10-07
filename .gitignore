@@ -1,0 +1,27 @@
+# Microsoft Office temporary files
+~$*
+
+# Credentials and secrets
+*.key
+*.pem
+*.pfx
+*.p12
+.env
+.env.*
+
+# VirtualBox files
+*.vdi
+*.vmdk
+*.vbox-prev
+*.sav
+
+# Splunk runtime files
+*.log
+
+# Windows temporary files
+Thumbs.db
+desktop.ini
+
+# IDE/editor files
+.vscode/
+.idea/
